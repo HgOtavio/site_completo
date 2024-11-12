@@ -2,7 +2,7 @@
 include_once('conex.php');
 
 if (isset($_POST['update'])) {
-    // Confirma se o formulário foi enviado
+    // Confirma se o formulário foi enviado via POST
     $id = $_POST['id_cds'];
     $nome = $_POST['nome'];
     $senha_antiga = $_POST['senha_antiga'];
@@ -29,51 +29,57 @@ if (isset($_POST['update'])) {
     }
 
     // Recupera a senha atual do banco de dados
-    $sqlSelect = "SELECT senha FROM Cadastro WHERE id_cds = '$id'";
-    $result = $conexao->query($sqlSelect);
+    $sqlSelect = "SELECT senha FROM Cadastro WHERE id_cds = ?";
+    if ($stmt = $conexao->prepare($sqlSelect)) {
+        $stmt->bind_param("i", $id); // Bind do id como inteiro
+        $stmt->execute();
+        $result = $stmt->get_result();
 
-    if ($result && $result->num_rows > 0) {
-        $user_data = $result->fetch_assoc();
-        $senha_atual = $user_data['senha'];
+        if ($result && $result->num_rows > 0) {
+            $user_data = $result->fetch_assoc();
+            $senha_atual = $user_data['senha'];
 
-        // Verifica se a senha antiga fornecida é igual à senha armazenada no banco de dados
-        if (password_verify($senha_antiga, $senha_atual)) {
-            // Se a senha antiga estiver correta, atualiza a senha nova, se fornecida
-            if (!empty($senha_nova)) {
-                // Criptografa a nova senha
-                $senha_nova_hash = password_hash($senha_nova, PASSWORD_DEFAULT);
+            // Verifica se a senha antiga fornecida é igual à senha armazenada no banco de dados
+            if (password_verify($senha_antiga, $senha_atual)) {
+                // Se a senha antiga estiver correta, atualiza a senha nova, se fornecida
+                if (!empty($senha_nova)) {
+                    // Criptografa a nova senha
+                    $senha_nova_hash = password_hash($senha_nova, PASSWORD_DEFAULT);
+                } else {
+                    // Caso a senha nova não tenha sido fornecida, mantém a senha atual
+                    $senha_nova_hash = $senha_atual;
+                }
+
+                // Prepara e executa a consulta de atualização
+                $updateStmt = $conexao->prepare("UPDATE Cadastro 
+                    SET nome=?, senha=?, email=?, cep=?, cidade=?, estado=?, pais=?, bairro=?, numero=?, complemento=? 
+                    WHERE id_cds=?");
+
+                if ($updateStmt === false) {
+                    die("Erro na preparação da consulta: " . $conexao->error);
+                }
+
+                // Faz a ligação dos parâmetros e executa
+                $updateStmt->bind_param("ssssssssssi", $nome, $senha_nova_hash, $email, $cep, $cidade, $estado, $pais, $bairro, $numero, $complemento, $id);
+
+                if ($updateStmt->execute()) {
+                    // Redireciona após a atualização bem-sucedida
+                    header('Location: Betasite.php');
+                    exit;
+                } else {
+                    echo "Erro ao atualizar os dados: " . $updateStmt->error;
+                }
+
+                $updateStmt->close();
             } else {
-                // Caso a senha nova não tenha sido fornecida, mantém a senha atual
-                $senha_nova_hash = $senha_atual;
+                // Caso a senha antiga não seja válida, exibe uma mensagem de erro
+                echo "Senha antiga incorreta.";
             }
-
-            // Prepara e executa a consulta de atualização
-            $stmt = $conexao->prepare("UPDATE Cadastro 
-                SET nome=?, senha=?, email=?, cep=?, cidade=?, estado=?, pais=?, bairro=?, numero=?, complemento=? 
-                WHERE id_cds=?");
-
-            if ($stmt === false) {
-                die("Erro na preparação da consulta: " . $conexao->error);
-            }
-
-            // Faz a ligação dos parâmetros e executa
-            $stmt->bind_param("ssssssssssi", $nome, $senha_nova_hash, $email, $cep, $cidade, $estado, $pais, $bairro, $numero, $complemento, $id);
-
-            if ($stmt->execute()) {
-                // Redireciona após a atualização bem-sucedida
-                header('Location: Betasite.php');
-                exit;
-            } else {
-                echo "Erro ao atualizar os dados: " . $stmt->error;
-            }
-
-            $stmt->close();
         } else {
-            // Caso a senha antiga não seja válida, exibe uma mensagem de erro
-            echo "Senha antiga incorreta.";
+            echo "Erro ao recuperar os dados do usuário.";
         }
-    } else {
-        echo "Erro ao recuperar os dados do usuário.";
+
+        $stmt->close();
     }
 
     $conexao->close();

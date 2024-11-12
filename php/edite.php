@@ -1,19 +1,30 @@
 <?php
+    // Ativa a exibição de erros para facilitar a depuração
     error_reporting(E_ALL);
     ini_set('display_errors', 1);
 
+    // Verifica se o parâmetro 'id_cds' foi passado via GET
     if (!empty($_GET['id_cds'])) {
+        // Inclui o arquivo de conexão com o banco de dados
         include_once('conex.php');
 
+        // Obtém o valor de 'id_cds' da URL
         $id = $_GET['id_cds'];
+        
+        // Cria uma consulta SQL para selecionar todos os dados do usuário com base no 'id_cds'
         $sqlSelect = "SELECT * FROM Cadastro WHERE id_cds = '$id'";
+
+        // Executa a consulta no banco de dados
         $result = $conexao->query($sqlSelect);
 
+        // Se a consulta falhar, exibe uma mensagem de erro
         if (!$result) {
             die("Erro na consulta SQL: " . $conexao->error);
         }
 
+        // Verifica se o resultado contém algum dado (usuário encontrado)
         if ($result->num_rows > 0) {
+            // Extrai os dados do usuário para variáveis
             $user_data = $result->fetch_assoc();
             $nome = $user_data['nome'];
             $senha = $user_data['senha'];
@@ -26,13 +37,11 @@
             $numero = $user_data['numero'];
             $complemento = $user_data['complemento'];
         } else {
+            // Se nenhum usuário for encontrado, redireciona para a página de cadastro
             header('Location: cadastro02.php');
             exit;
         }
-    } else {
-        header('Location: cadastro02.php');
-        exit;
-    }
+    } 
 ?>
 <!DOCTYPE html>
 <html lang="pt">

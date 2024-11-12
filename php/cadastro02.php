@@ -1,4 +1,5 @@
 <?php
+// Verificar conexão
 session_start();
 include_once('conex.php');
 

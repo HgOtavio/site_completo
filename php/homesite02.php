@@ -600,6 +600,9 @@ body::-webkit-scrollbar {
     .header, .footer {
         text-align: center;
     }
+    .img_fim {
+    width: 65px;
+    }
 }
     </style>
 </head>
@@ -835,12 +838,11 @@ body::-webkit-scrollbar {
             <div id="redes_sa">
                 <h3 class="separar">Redes sociais</h3>
                 <div id="redes">
-                    <p><a href="#"><img src="#" alt="facebook"></a></p>
-                    <p><a href="#"><img src="#" alt="Instagram"></a></p>
-                    <p><a href="#"><img src="#" alt="X"></a></p>
-                    <p><a href="#"><img src="#" alt="tiktok"></a></p>
-                    <p><a href="#"><img src="#" alt="Discord"></a></p>
-                    <p><a href="#"><img src="#" alt="Youtube"></a></p>
+                <p ><a href="#"><img class="img_fim" src="favicon\Captura_de_tela_2024-11-11_101934-removebg-preview.png" alt="facebook"></a></p>
+                    <p ><a href="#"><img class="img_fim" src="favicon\Captura_de_tela_2024-11-11_102012-removebg-preview.png" alt="Instagram"></a></p>
+                    <p ><a href="#"><img class="img_fim" src="favicon\Captura_de_tela_2024-11-11_102025-removebg-preview.png" alt="X"></a></p>
+                    <p ><a href="#"><img class="img_fim" src="favicon\Captura_de_tela_2024-11-11_101952-removebg-preview.png" alt="Whatsapp"></a></p>
+                    <p ><a href="#"><img class="img_fim" src="favicon\Captura_de_tela_2024-11-11_102000-removebg-preview.png" alt="Youtube"></a></p>
                 </div>
             </div>
         </div>    
